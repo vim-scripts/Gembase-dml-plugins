@@ -25,16 +25,16 @@ set cpo&vim
 
 let s:slip = 8
 
-function s:IsNonNull(lnum)
+function IsNonNull(lnum)
     return getline(a:lnum) =~ '^\s*\%(!\|$\)' ? 0 : 1
 endfunction
 
-function s:PrevNonNull(lnum)
+function PrevNonNull(lnum)
     if a:lnum == 1
-        return s:IsNonNull(a:lnum) == 0 ? 0 : 1
+        return IsNonNull(a:lnum) == 0 ? 0 : 1
     else
         for lnum in range(a:lnum,1,-1)
-            if s:IsNonNull(lnum) == 0
+            if IsNonNull(lnum) == 0
                 continue
             else
                 return lnum
@@ -44,15 +44,15 @@ function s:PrevNonNull(lnum)
     endif
 endfunction
 
-function s:BlockBeginning(lnum)
+function BlockBeginning(lnum)
     let pnum = a:lnum
-    let lnum = s:PrevNonNull(pnum - 1)
+    let lnum = PrevNonNull(pnum - 1)
     while 1
         if lnum == 0
             " 0 means current is empty or a comment and on the top of the file
-            return s:IsNonNull(pnum) == 1 ? pnum : 0
+            return IsNonNull(pnum) == 1 ? pnum : 0
         endif
-        let lnum = s:PrevNonNull(pnum - 1)
+        let lnum = PrevNonNull(pnum - 1)
         if getline(lnum) =~ '&\s*$'
             let pnum = lnum
         else
@@ -61,30 +61,30 @@ function s:BlockBeginning(lnum)
     endwhile
 endfunction
 
-function s:LastBlockBeginning(lnum)
-    let lnum = s:BlockBeginning(a:lnum)
+function LastBlockBeginning(lnum)
+    let lnum = BlockBeginning(a:lnum)
     if lnum != 0
-        let lnum = s:PrevNonNull(lnum - 1)
+        let lnum = PrevNonNull(lnum - 1)
         if lnum != 0
-            return s:BlockBeginning(lnum)
+            return BlockBeginning(lnum)
         endif
     endif
     " 0 means current line is not in any block, or this is the first block
     return 0
 endfunction
 
-function s:LastBlockEnding(lnum)
-    let lnum = s:BlockBeginning(a:lnum)
+function LastBlockEnding(lnum)
+    let lnum = BlockBeginning(a:lnum)
     if lnum != 0
-        let lnum = s:PrevNonNull(lnum - 1)
-        if lnum != 0 && s:BlockBeginning(lnum) != 0
+        let lnum = PrevNonNull(lnum - 1)
+        if lnum != 0 && BlockBeginning(lnum) != 0
             return lnum
         endif
     endif
     return 0
 endfunction
 
-function s:FindLastCharacter(lnum)
+function FindLastCharacter(lnum)
     let line = getline(a:lnum)
     for position in range(len(line)-1,0,-1)
         if line[position] !~ '\s'
@@ -95,7 +95,7 @@ function s:FindLastCharacter(lnum)
 endfunction
 
 "Notice: the first line must contains character '('
-function s:MatchParenPos(start,end)
+function MatchParenPos(start,end)
     " locate character '('
     let line = getline(a:start)
     let length = len(line)
@@ -120,10 +120,10 @@ function s:MatchParenPos(start,end)
             return [a:start,tail]
         endif
     endfor
-    " locate character ')' in continuous lines if the first line doesn't it
+    " locate character ')' in continuous lines if it doesn't exist in the first line
     if a:start < a:end
         for lnum in range(a:start + 1,a:end)
-            if s:IsNonNull(lnum) == 1
+            if IsNonNull(lnum) == 1
                 let line = getline(lnum)
                 for tail in range(len(line))
                     let character = line[tail]
@@ -143,13 +143,13 @@ function s:MatchParenPos(start,end)
 endfunction
 
 function GetDmlIndent()
-    let cbnum = s:BlockBeginning(v:lnum)
+    let cbnum = BlockBeginning(v:lnum)
     if cbnum == 0 
         return 0
     endif
 
-    let lbnum = s:LastBlockBeginning(v:lnum)
-    let line = getline(s:PrevNonNull(v:lnum - 1))
+    let lbnum = LastBlockBeginning(v:lnum)
+    let line = getline(PrevNonNull(v:lnum - 1))
 
     " judge current line's indent according to above lines
     if line !~ '&\s*$'
@@ -160,9 +160,9 @@ function GetDmlIndent()
             let ind = ind + &sw
         endif
         if line =~? '^\s*\<\%(IF\|WHILE\|ELSE_IF\)\>\s*('
-            let lenum = s:LastBlockEnding(v:lnum)
-            let matchpos = s:MatchParenPos(lbnum,lenum)
-            let lastpos = s:FindLastCharacter(lenum)
+            let lenum = LastBlockEnding(v:lnum)
+            let matchpos = MatchParenPos(lbnum,lenum)
+            let lastpos = FindLastCharacter(lenum)
             if matchpos == lastpos
                 let ind = ind + &sw
             endif
@@ -179,6 +179,8 @@ function GetDmlIndent()
 
     return ind
 endfunction
+
+nmenu Gembase.Auto-Indent gg=G
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
