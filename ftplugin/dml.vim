@@ -47,12 +47,99 @@ if exists("loaded_matchit")
         \ '(:)'
 endif
 
-nmenu Gembase.Block.Next\ BEGIN  ]]
-nmenu Gembase.Block.Next\ END []
-nmenu Gembase.Block.Prev\ BEGIN [[
-nmenu Gembase.Block.Prev\ END []
-nmenu Gembase.Comment.Next\ comment ]!
-nmenu Gembase.Comment.Prev\ comment [!
-nmenu Gembase.Matchit\ Jump %
+iabbrev <buffer> FORM FORM<CR>END_FORM<UP><END>
+iabbrev <buffer> MENU_FORM MENU_FORM<CR>END_FORM<UP><END>
+iabbrev <buffer> PROCEDURE_FORM PROCEDURE_FORM<CR>END_FORM<UP><END>
+iabbrev <buffer> QUERY_FORM QUERY_FORM<CR>END_FORM<UP><END>
+iabbrev <buffer> REPORT_FORM REPORT_FORM<CR>END_FORM<UP><END>
+iabbrev <buffer> TABLE_FORM TABLE_FORM<CR>END_FORM<UP><END>
+iabbrev <buffer> form form<CR>end_form<UP><END>
+iabbrev <buffer> menu_form menu_form<CR>end_form<UP><END>
+iabbrev <buffer> procedure_form procedure_form<CR>end_form<UP><END>
+iabbrev <buffer> query_form query_form<CR>end_form<UP><END>
+iabbrev <buffer> report_form report_form<CR>end_form<UP><END>
+iabbrev <buffer> table_form table_form<CR>end_form<UP><END>
+
+iabbrev <buffer> BEGIN_BLOCK BEGIN_BLOCK<CR>END_BLOCK<UP><END>
+iabbrev <buffer> begin_block begin_block<CR>end_block<UP><END>
+
+iabbrev <buffer> IF IF ( )<CR>END_IF<UP><END><LEFT><LEFT>
+iabbrev <buffer> if if ( )<CR>end_if<UP><END><LEFT><LEFT>
+iabbrev <buffer> ELSE_IF ELSE_IF ( )<LEFT><END><LEFT><LEFT>
+iabbrev <buffer> else_if else_if ( )<LEFT><END><LEFT><LEFT>
+iabbrev <buffer> WHILE WHILE ( )<CR>END_WHILE<UP><END><LEFT><LEFT>
+iabbrev <buffer> while while ( )<CR>end_while<UP><END><LEFT><LEFT>
+iabbrev <buffer> BEGIN_CASE BEGIN_CASE ( )<CR>END_CASE<UP><END><LEFT><LEFT>
+iabbrev <buffer> begin_case begin_case ( )<CR>end_case<UP><END><LEFT><LEFT>
+
+" Auto-complete parenthesis
+inoremap ( ()<ESC>i
+inoremap <silent>) <c-r>=ClosePair(')')<CR>
+inoremap { {}<ESC>i
+inoremap <silent>} <c-r>=ClosePair('}')<CR>
+inoremap [ []<ESC>i
+inoremap <silent>] <c-r>=ClosePair(']')<CR>
+inoremap < <><ESC>i
+inoremap <silent>> <c-r>=ClosePair('>')<CR>
+
+function! ClosePair(char)
+    if getline('.')[col('.') - 1] == a:char
+        return "\<Right>"
+    else
+        return a:char
+    endif
+endfunction
+
+" Some functionalities running only in gui
+if has("gui_running")
+
+    " display a help tip when cursor over a folder
+    setlocal ballooneval
+    setlocal balloonexpr=FoldSpellBalloon()
+
+    function! FoldSpellBalloon()
+        let foldStart = foldclosed(v:beval_lnum )
+        let foldEnd = foldclosedend(v:beval_lnum)
+        let lines = []
+        if foldStart >= 0
+            " we are in a fold
+            let numLines = foldEnd - foldStart + 1
+            " if we have too many lines in fold, show only the first 14 and the last 14 lines
+            if ( numLines > 31 )
+                let lines = getline( foldStart, foldStart + 14 )
+                let lines += [ '-- Snipped ' . ( numLines - 30 ) . ' lines --' ]
+                let lines += getline( foldEnd - 14, foldEnd )
+            else
+                "less than 30 lines, lets show all of them
+                let lines = getline( foldStart, foldEnd )
+            endif
+        endif
+        " return result
+        return join( lines, has( "balloon_multiline" ) ? "\n" : " " )
+    endfunction
+
+    " Add menu items
+    nmenu Gembase.Jump.Block.Next\ BEGIN ]]zz
+    nmenu Gembase.Jump.Block.Next\ END []zz
+    nmenu Gembase.Jump.Block.Prev\ BEGIN [[zz
+    nmenu Gembase.Jump.Block.Prev\ END []zz
+    nmenu Gembase.Jump.Comment.Next\ comment ]!zz
+    nmenu Gembase.Jump.Comment.Prev\ comment [!zz
+    nmenu Gembase.Matchit\ Jump %
+    amenu <silent>Gembase.Spell\ check\ toggle <ESC>:call SpellCheckToggle()<CR>
+
+    function! SpellCheckToggle()
+        if &spell 
+            let &spell = 0
+            echo "Spell check close."
+        else
+            let &spell = 1
+            echo "Spell check open."
+        endif
+    endfunction
+    
+    let b:undo_ftplugin += "balloonexpr< ballooneval<"
+
+endif
 
 let &cpo = cpo_save

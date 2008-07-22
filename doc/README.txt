@@ -31,11 +31,15 @@ By default, shiftwidth equals to 4 spaces (If you need a tab with 8 spaces, try 
 
 3. ftplugin
 
-Functionality of this script is simple so far:
+This script provides several useful functionality:
 
-        a) set comments to format dashed line with leader character "!" when hitting <CR> or using "o";
-        b) set hot-keys to support fast jumpping among blocks by using "]]" (next "BEGIN_BLOCK"), "[[" (previous "BEGIN_BLOCK"), "][" (next "END_BLOCK"), "[]" (previous "END_BLOCK"), and among comments by using "]!" (next comment) and "[!" (previous comment);
-        c) support "matchit" plugin to jump betwteen keywords within a structure by hitting key "%" in normal mode. Such as "IF" -> "ELSE_IF" -> "ELSE" -> "END_IF", etc.
+        a) most usefully, it will auto-complete suited declaration keywords after you inputed its beginning, for instance, in the insert mode, if you input declaration "BEGIN_BLOCK" and hit a space, then system will auto-complete "END_BLOCK";
+        b) set comments to format dashed line with leader character "!" when hitting <CR> or using "o";
+        c) set hot-keys to support fast jumpping among blocks by using "]]" (next "BEGIN_BLOCK"), "[[" (previous "BEGIN_BLOCK"), "][" (next "END_BLOCK"), "[]" (previous "END_BLOCK"), and among comments by using "]!" (next comment) and "[!" (previous comment);
+        d) support "matchit" plugin to jump betwteen keywords within a structure by hitting key "%" in normal mode. Such as "IF" -> "ELSE_IF" -> "ELSE" -> "END_IF", etc.
+        e) also provides parenthesis auto-completion;
+        f) if you runs in GUI, it provides a menu column, which lists some funcional item;
+        g) if you runs in GUI and made a folder, when cursor hangs over it, then system will display a help tip to show the less than 30 lines within folder.
 
 4. TODO
 
