@@ -1,13 +1,13 @@
                               GEMBASE DML PLUGINS
 
 AUTHOR: Frank Sun <frank.sun.319@gmail.com>
-VERSION: 0.9.05
+VERSION: 1.0
 DATE: 2007-07-17
 VIM ENVIRONMENT: version 7
 
 DESCRIPTION
 
-This package includes three scripts, a syntax script, an auto-indentation file and a ftplugin, which supports fast jumpping, comment dashed list and matchit with "%". I plan to add omni-completion functionality into ftplugin in the near future.
+This package includes three scripts, a syntax script, an auto-indentation file and a ftplugin, which mainly provides omni-completion, suited declaration auto-completion and some accessorial functionalities.
 
 1. Syntax highlight
 
@@ -31,21 +31,26 @@ By default, shiftwidth equals to 4 spaces (If you need a tab with 8 spaces, try 
 
 3. ftplugin
 
-This script provides several useful functionality:
+This script provides several useful functionalities, the most useful two are:
 
-        a) most usefully, it will auto-complete suited declaration keywords after you inputed its beginning, for instance, in the insert mode, if you input declaration "BEGIN_BLOCK" and hit a space, then system will auto-complete "END_BLOCK";
-        b) set comments to format dashed line with leader character "!" when hitting <CR> or using "o";
-        c) set hot-keys to support fast jumpping among blocks by using "]]" (next "BEGIN_BLOCK"), "[[" (previous "BEGIN_BLOCK"), "][" (next "END_BLOCK"), "[]" (previous "END_BLOCK"), and among comments by using "]!" (next comment) and "[!" (previous comment);
-        d) support "matchit" plugin to jump betwteen keywords within a structure by hitting key "%" in normal mode. Such as "IF" -> "ELSE_IF" -> "ELSE" -> "END_IF", etc.
-        e) also provides parenthesis auto-completion;
-        f) if you runs in GUI, it provides a menu column, which lists some funcional item;
-        g) if you runs in GUI and made a folder, when cursor hangs over it, then system will display a help tip to show the less than 30 lines within folder.
+        a) in the insert mode, it provides omni-completion of almost all of Gembase language-keywords. If you inputed a prefix, you could hit keys "Ctrl + X + Ctrl + O" to complete its suffix. By default, it is binded to <F6>:
+                            inoremap <F6> <C-X><C-O>
+you can also manually remap it, besides, an menu item also provides to execute it;
+        b) in the insert mode, it will auto-complete suited declaration keywords after its beginning was inputed, for instance, if you input string "BEGIN_BLOCK?", NOTICE: the keyword must be followed by a question mark "?", then hit a space, system will auto-complete "END_BLOCK";
+
+Others are some accessorial enhancements:
+
+        c) set comments to format dashed line with leader character "!" when hitting <CR> or using "o";
+        d) set hot-keys to support fast jumping among blocks by using "]]" (next "BEGIN_BLOCK"), "[[" (previous "BEGIN_BLOCK"), "][" (next "END_BLOCK"), "[]" (previous "END_BLOCK"), and among comments by using "]!" (next comment) and "[!" (previous comment);
+        e) support "matchit" plugin to jump between keywords within a structure by hitting key "%" in normal mode. Such as "IF" -> "ELSE_IF" -> "ELSE" -> "END_IF", etc.
+        f) also provides parenthesis auto-completion;
+        g) if you runs in GUI, it provides a menu column, which lists some functional item;
+        i) if you runs in GUI and made a folder, when cursor hangs over it, then system will display a help tip to show the less than 30 lines within folder.
 
 4. TODO
 
           a) when handling an ending statement, check its mate to decide whether indent;
-          b) add omni-completion functionality;
-          c) support fast jumpping and matchit switching between six kinds of forms
+          b) support fast jumping and matchit switching between six kinds of forms
 
 INSTALL DETAILS
 
@@ -55,6 +60,7 @@ INSTALL DETAILS
           put the syntax script into directory $HOME/.vim/syntax/
           put the indent script into directory $HOME/.vim/indent/
           put the ftplugin script into directory $HOME/.vim/ftplugin/
+          put the file "./ftplugin/gembase/dict" into directory $HOME/.vim/ftplugin/gembase/
 
 2. For Windows:
 
@@ -62,3 +68,4 @@ INSTALL DETAILS
           put the syntax script into directory $VIM\vimfiles\syntax\
           put the indent script into directory $VIM\vimfiles\indent\
           put the ftplugin script into directory $VIM\vimfiles\ftplugin\
+          put the file ".\ftplugin\gembase\dict" into directory $VIM\.vim\ftplugin\gembase\

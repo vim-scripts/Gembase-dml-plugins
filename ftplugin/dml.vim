@@ -4,12 +4,17 @@
 " Last Change:	2008-07-20
 " Version: 0.3
 
-" Only do this when not done yet for this buffer
-if exists("b:did_ftplugin")
-  finish
+" Check vim version
+if version < 700
+    echo "Vim version must higher than 7.0"
+    finish
 endif
 
-" Don't load another plugin for this buffer
+" Only do this when not done yet for this buffer
+if exists("b:did_ftplugin")
+    finish
+endif
+
 let b:did_ftplugin = 1
 
 let cpo_save = &cpo
@@ -38,57 +43,117 @@ noremap <silent><buffer> [! :call search('\%(^\s*!.*\n\)\%(^\s*!\)\@!',"bW")<CR>
 
 " Let the matchit plugin know what items can be matched.
 if exists("loaded_matchit")
-  let b:match_ignorecase = 1
-  let b:match_words =
-        \ '\<begin_block\>:\<end_block\>,' .
-        \ '\<if\>:\<else_if\>:\<else\>:\<end_if\>,' .
-        \ '\<while\>:\<end_while\>,' .
-        \ '\<begin_case\>:\<case\>:\<end_case\>,' .
-        \ '(:)'
+    let b:match_ignorecase = 1
+    let b:match_words =
+                \ '\<begin_block\>:\<end_block\>,' .
+                \ '\<if\>:\<else_if\>:\<else\>:\<end_if\>,' .
+                \ '\<while\>:\<end_while\>,' .
+                \ '\<begin_case\>:\<case\>:\<end_case\>,' .
+                \ '(:)'
 endif
 
-iabbrev <buffer> FORM FORM<CR>END_FORM<UP><END>
-iabbrev <buffer> MENU_FORM MENU_FORM<CR>END_FORM<UP><END>
-iabbrev <buffer> PROCEDURE_FORM PROCEDURE_FORM<CR>END_FORM<UP><END>
-iabbrev <buffer> QUERY_FORM QUERY_FORM<CR>END_FORM<UP><END>
-iabbrev <buffer> REPORT_FORM REPORT_FORM<CR>END_FORM<UP><END>
-iabbrev <buffer> TABLE_FORM TABLE_FORM<CR>END_FORM<UP><END>
-iabbrev <buffer> form form<CR>end_form<UP><END>
-iabbrev <buffer> menu_form menu_form<CR>end_form<UP><END>
-iabbrev <buffer> procedure_form procedure_form<CR>end_form<UP><END>
-iabbrev <buffer> query_form query_form<CR>end_form<UP><END>
-iabbrev <buffer> report_form report_form<CR>end_form<UP><END>
-iabbrev <buffer> table_form table_form<CR>end_form<UP><END>
+" Hit keywords and a question mark "?" then trigger abbreviation completion
+" Reason to do so is to avoid conflicting with comment
+iabbrev <buffer> FORM? FORM<CR>END_FORM<UP><END>
+iabbrev <buffer> MENU_FORM? MENU_FORM<CR>END_FORM<UP><END>
+iabbrev <buffer> PROCEDURE_FORM? PROCEDURE_FORM<CR>END_FORM<UP><END>
+iabbrev <buffer> QUERY_FORM QUERY?_FORM<CR>END_FORM<UP><END>
+iabbrev <buffer> REPORT_FORM? REPORT_FORM<CR>END_FORM<UP><END>
+iabbrev <buffer> TABLE_FORM? TABLE_FORM<CR>END_FORM<UP><END>
+iabbrev <buffer> form? form<CR>end_form<UP><END>
+iabbrev <buffer> menu_form? menu_form<CR>end_form<UP><END>
+iabbrev <buffer> procedure_form? procedure_form<CR>end_form<UP><END>
+iabbrev <buffer> query_form? query_form<CR>end_form<UP><END>
+iabbrev <buffer> report_form? report_form<CR>end_form<UP><END>
+iabbrev <buffer> table_form? table_form<CR>end_form<UP><END>
 
-iabbrev <buffer> BEGIN_BLOCK BEGIN_BLOCK<CR>END_BLOCK<UP><END>
-iabbrev <buffer> begin_block begin_block<CR>end_block<UP><END>
+iabbrev <buffer> BEGIN_BLOCK? BEGIN_BLOCK<CR>END_BLOCK<UP><END>
+iabbrev <buffer> begin_block? begin_block<CR>end_block<UP><END>
 
-iabbrev <buffer> IF IF ( )<CR>END_IF<UP><END><LEFT><LEFT>
-iabbrev <buffer> if if ( )<CR>end_if<UP><END><LEFT><LEFT>
-iabbrev <buffer> ELSE_IF ELSE_IF ( )<LEFT><END><LEFT><LEFT>
-iabbrev <buffer> else_if else_if ( )<LEFT><END><LEFT><LEFT>
-iabbrev <buffer> WHILE WHILE ( )<CR>END_WHILE<UP><END><LEFT><LEFT>
-iabbrev <buffer> while while ( )<CR>end_while<UP><END><LEFT><LEFT>
-iabbrev <buffer> BEGIN_CASE BEGIN_CASE ( )<CR>END_CASE<UP><END><LEFT><LEFT>
-iabbrev <buffer> begin_case begin_case ( )<CR>end_case<UP><END><LEFT><LEFT>
+iabbrev <buffer> IF? IF ( )<CR>END_IF<UP><END><LEFT><LEFT>
+iabbrev <buffer> if? if ( )<CR>end_if<UP><END><LEFT><LEFT>
+iabbrev <buffer> WHILE? WHILE ( )<CR>END_WHILE<UP><END><LEFT><LEFT>
+iabbrev <buffer> ELSE_IF? ELSE_IF ( )<LEFT><LEFT>
+iabbrev <buffer> else_if? else_if ( )<LEFT><LEFT>
+iabbrev <buffer> while? while ( )<CR>end_while<UP><END><LEFT><LEFT>
+iabbrev <buffer> BEGIN_CASE? BEGIN_CASE ( )<CR>END_CASE<UP><END><LEFT><LEFT>
+iabbrev <buffer> begin_case? begin_case ( )<CR>end_case<UP><END><LEFT><LEFT>
+iabbrev <buffer> CASE? CASE ( )<LEFT><LEFT>
+iabbrev <buffer> case? case ( )<LEFT><LEFT>
 
 " Auto-complete parenthesis
 inoremap ( ()<ESC>i
-inoremap <silent>) <c-r>=ClosePair(')')<CR>
+inoremap <silent>) <c-r>=<SID>:ClosePair(')')<CR>
 inoremap { {}<ESC>i
-inoremap <silent>} <c-r>=ClosePair('}')<CR>
+inoremap <silent>} <c-r>=<SID>:ClosePair('}')<CR>
 inoremap [ []<ESC>i
-inoremap <silent>] <c-r>=ClosePair(']')<CR>
+inoremap <silent>] <c-r>=<SID>:ClosePair(']')<CR>
 inoremap < <><ESC>i
-inoremap <silent>> <c-r>=ClosePair('>')<CR>
+inoremap <silent>> <c-r>=<SID>:ClosePair('>')<CR>
 
-function! ClosePair(char)
+function! <SID>:ClosePair(char)
     if getline('.')[col('.') - 1] == a:char
         return "\<Right>"
     else
         return a:char
     endif
 endfunction
+
+" wether a character is lower or upper
+function! CharCase(char)
+    let char = char2nr(a:char)
+    " upper case
+    if char >= 65 && char <= 90
+        return "upper"
+    " lower case
+    elseif char >= 97 && char <= 122
+        return "lower"
+    endif
+endfunction
+
+function! CompleteKeywords(findstart, base)
+    if a:findstart
+        " locate the start of the word
+        let line = getline('.')
+        let start = col('.') - 1
+        while start > 0 && line[start - 1] !~ '\(\s\|%\)'
+            let start -= 1
+        endwhile
+        return start
+    else
+        let res = []
+        " read the dict
+        for keyword in readfile($VIM . '\vimfiles\ftplugin\gembase\dict')
+            if keyword =~ '^' . a:base
+                if CharCase(a:base[0]) == "lower"
+                    let keyword = tolower(keyword)
+                endif
+                call add(res,keyword)
+            endif
+        endfor
+        return res
+    endif
+endfunction
+
+set omnifunc=CompleteKeywords
+
+function! SuperCleverTab()
+    " check if at beginning of line or after a space
+    if strpart( getline('.'), 0, col('.')-1 ) =~ '^\s*$'
+        return "\<Tab>"
+    else
+        " do we have omni completion available
+        if &omnifunc != ''
+            " use omni-completion 1. priority
+            return "\<C-X>\<C-O>"
+        else
+            " use known-word completion
+            return "\<C-N>"
+        endif
+    endif
+endfunction
+
+inoremap <silent><buffer><TAB> <C-R>=SuperCleverTab()<CR>
 
 " Some functionalities running only in gui
 if has("gui_running")
@@ -119,6 +184,7 @@ if has("gui_running")
     endfunction
 
     " Add menu items
+    imenu Gembase.Auto-Completion <F6>
     nmenu Gembase.Jump.Block.Next\ BEGIN ]]zz
     nmenu Gembase.Jump.Block.Next\ END []zz
     nmenu Gembase.Jump.Block.Prev\ BEGIN [[zz
@@ -126,9 +192,9 @@ if has("gui_running")
     nmenu Gembase.Jump.Comment.Next\ comment ]!zz
     nmenu Gembase.Jump.Comment.Prev\ comment [!zz
     nmenu Gembase.Matchit\ Jump %
-    amenu <silent>Gembase.Spell\ check\ toggle <ESC>:call SpellCheckToggle()<CR>
+    amenu <silent>Gembase.Spell\ check\ toggle <ESC>:call <SID>:SpellCheckToggle()<CR>
 
-    function! SpellCheckToggle()
+    function! <SID>:SpellCheckToggle()
         if &spell 
             let &spell = 0
             echo "Spell check close."
@@ -137,7 +203,7 @@ if has("gui_running")
             echo "Spell check open."
         endif
     endfunction
-    
+
     let b:undo_ftplugin += "balloonexpr< ballooneval<"
 
 endif

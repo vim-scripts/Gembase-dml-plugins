@@ -7,8 +7,6 @@
 syn case ignore
 "syn spell toplevel
 
-nmenu <silent>Gembase.Syntax\ on :set syntax=dml<CR>
-
 syn keyword gForms FORM MENU_FORM PROCEDURE_FORM QUERY_FORM REPORT_FORM TABLE_FORM END_FORM
 syn keyword gBlocks BEGIN_BLOCK END_BLOCK INPUT_BLOCK MENU_BLOCK OUTPUT_BLOCK PAUSE_BLOCK YESNO_BLOCK
 syn keyword gStructure END_IF END_WHILE END_CASE CASE ELSE
