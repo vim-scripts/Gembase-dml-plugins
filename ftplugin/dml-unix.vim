@@ -116,16 +116,19 @@ function! CompleteKeywords(findstart, base)
         " locate the start of the word
         let line = getline('.')
         let start = col('.') - 1
-        while start > 0 && line[start - 1] !~ '\(\s\|%\)'
+        while start > 0 && line[start - 1] != '[A-Za-z0-9%]'
             let start -= 1
         endwhile
         return start
     else
         let res = []
         " read the dict
-        for keyword in readfile($VIM . '\vimfiles\ftplugin\gembase\dict')
+        " For Unix
+        for keyword in readfile($HOME . '/.vim/ftplugin/gembase/dict')
+        " For Windows
+        "for keyword in readfile($VIM . '\vimfiles\ftplugin\gembase\dict')
             if keyword =~ '^' . a:base
-                if CharCase(a:base[0]) == "lower"
+                if a:abse != '%' && CharCase(a:base[0]) == "lower"
                     let keyword = tolower(keyword)
                 endif
                 call add(res,keyword)

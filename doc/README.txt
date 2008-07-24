@@ -25,16 +25,15 @@ Highlighted language-elements listed as below:
 
 2. Auto-indentation
 
-In the insert mode, it will auto-indent form, block, structures and continuous lines marked with character ¡°&¡±. In the normal mode, you can use it to check codes validity (hit keys: "gg=G"). Some mismatched keywords and abuse of character "&" were found in dml files when I run it.
+In the insert mode, it will auto-indent form, block, structures and continuous lines marked with character "&". In the normal mode, you can use it to check codes validity (hit keys: "gg=G"). Some mismatched keywords and abuse of character "&" were found in dml files when I run it.
 
-By default, shiftwidth equals to 4 spaces (If you need a tab with 8 spaces, try to hit "ctrl + v + tab¡°), value of syntactic indent equals to shiftwidth, and continue line marked with character "&" indents 8 spaces (you can configure it by changing the variable "s:slip" in indent script). 
+By default, shiftwidth equals to 4 spaces (If you need a tab with 8 spaces, try to hit "CTRL + V + TAB), value of syntactic indent equals to shiftwidth, and continue line marked with character "&" indents 8 spaces (you can configure it by changing the variable "s:slip" in indent script). 
 
 3. ftplugin
 
 This script provides several useful functionalities, the most useful two are:
 
-        a) in the insert mode, it provides omni-completion of almost all of Gembase language-keywords. If you inputed a prefix, you could hit keys "Ctrl + X + Ctrl + O" to complete its suffix. By default, it is binded to <F6>:
-                            inoremap <F6> <C-X><C-O>
+        a) in the insert mode, it provide both omni-completion and known-word-completion functionality by a function "SuperCleverTab()". It is very convenient, when you hit key "Tab", vim will pop a balloon to lists all candidate keywords, use "CTRL + N" or "CTRL + P" to move focus, use "CTRL + Y" to pick up a candidate and "CTRL + E" to return original status. If you want to print a "Tab", just try "CTRL + V + Tab". You can also manually remap the hot-key, besides, an menu item also provides to execute it.
 you can also manually remap it, besides, an menu item also provides to execute it;
         b) in the insert mode, it will auto-complete suited declaration keywords after its beginning was inputed, for instance, if you input string "BEGIN_BLOCK?", NOTICE: the keyword must be followed by a question mark "?", then hit a space, system will auto-complete "END_BLOCK";
 
@@ -50,7 +49,13 @@ Others are some accessorial enhancements:
 4. TODO
 
           a) when handling an ending statement, check its mate to decide whether indent;
-          b) support fast jumping and matchit switching between six kinds of forms
+          b) support fast jumping and matchit switching between six kinds of forms;
+          c) write Gembase plugin for ctags.
+
+
+5. Acknowledgments
+
+I would like to thank Kim Schulz, without his excellent book "Hacking Vim", I can't complete ftplugin script in a few days.
 
 INSTALL DETAILS
 
@@ -59,7 +64,7 @@ INSTALL DETAILS
           put the filetype script into directory $HOME/.vim/
           put the syntax script into directory $HOME/.vim/syntax/
           put the indent script into directory $HOME/.vim/indent/
-          put the ftplugin script into directory $HOME/.vim/ftplugin/
+          put the ftplugin script (dml-unix.vim) into directory $HOME/.vim/ftplugin/, and rename it as "dml.vim"
           put the file "./ftplugin/gembase/dict" into directory $HOME/.vim/ftplugin/gembase/
 
 2. For Windows:
@@ -67,5 +72,5 @@ INSTALL DETAILS
           put the filetype script into directory $VIM\vimfiles\
           put the syntax script into directory $VIM\vimfiles\syntax\
           put the indent script into directory $VIM\vimfiles\indent\
-          put the ftplugin script into directory $VIM\vimfiles\ftplugin\
-          put the file ".\ftplugin\gembase\dict" into directory $VIM\.vim\ftplugin\gembase\
+          put the ftplugin script (dml-windows.vim) into directory $VIM\vimfiles\ftplugin\, and rename it as "dml.vim"
+          put the file ".\ftplugin\gembase\dict" into directory $VIM\vimfiles\ftplugin\gembase\
