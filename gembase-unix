@@ -1,0 +1,87 @@
+#!/bin/sh
+
+VIMDIR="$HOME/.vim"
+
+function ShowHelp ()
+{
+    echo -e "Usage:\n\tgembase-unix -h [--help]\
+    \n\tgembase-unix -i [--install]\
+    \n\tgembase-unix -u [--uninstall]"
+}
+
+function InstallFiles ()
+{
+    FT="$VIMDIR/filetype.vim"
+    if [ -f $FT ]; then
+        if [ -w $FT ]; then
+            if [ -z "`grep '\*\.dml' $FT`" ]; then
+                echo 'autocmd bufnewfile,bufread *.dml setf dml' >> $FT
+            fi
+        else
+            echo -e "****************************************************\
+            \n$FT is not writable, \
+            \nyou should add below line manually:\
+            \n\tautocmd BufNewFile,BufRead *.dml setf dml\
+            \n****************************************************"
+        fi
+    else
+        cp -rf filetype.vim $VIMDIR &
+    fi
+    cp -rf syntax indent ftplugin $VIMDIR &&\
+    cd $VIMDIR/ftplugin &&\
+    mv dml-unix.vim dml.vim &&\
+    rm -rf dml-windows.vim &
+
+    echo "Installation completed."
+}
+
+function UninstallFiles ()
+{
+    cd $VIMDIR
+    FT="$VIMDIR/filetype.vim"
+    if [ -f $FT ]; then
+        if [ -w $FT ]; then
+            ex +'%g/\*\.dml/d' +'wq' $FT &
+        else
+            echo -e "****************************************************\
+            \n$FT is not writable,\
+            \nyou should delete below line in this file manually:\
+            \n\tautocmd BufNewFile,BufRead *.dml setf dml\
+            \n****************************************************"
+        fi
+    fi
+    for dir in syntax indent ftplugin; do
+        rm -rf $VIMDIR/$dir/dml.vim &
+    done
+    rm -rf $VIMDIR/ftplugin/gembase &
+
+    echo "Uninstallation completed."
+}
+
+if (($#==0)) || (($#>2)); then
+    ShowHelp
+else
+    case $1 in
+        -i | --install )
+            if [ -d $VIMDIR ]; then
+                if [ -w $VIMDIR ]; then
+                    InstallFiles
+                else
+                    echo "Permission denied."
+                fi
+            else
+                mkdir $VIMDIR
+            fi
+            ;;
+        -u | --uninstall )
+            if [ -d $VIMDIR -a -w $VIMDIR ]; then
+                    UninstallFiles
+                else
+                    echo "Permission denied."
+            fi
+            ;;
+        -h | --help | * )
+            ShowHelp
+            ;;
+    esac
+fi
