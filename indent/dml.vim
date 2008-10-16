@@ -180,10 +180,6 @@ function GetDmlIndent()
     return ind
 endfunction
 
-if has("gui_running")
-    nmenu Gembase.Auto-Indent gg=G
-endif
-
 let &cpo = s:cpo_save
 unlet s:cpo_save
 " Vim indent file

@@ -1,8 +1,8 @@
 " Vim filetype plugin
 " Language:	Gembase dml file
 " Maintainer:	Frank Sun <frank.sun.319@gmail.com>
-" Last Change:	2008-07-20
-" Version: 0.3
+" Last Change:	2008-10-16
+" Version: 0.5
 
 " Check vim version
 if version < 700
@@ -70,26 +70,32 @@ iabbrev <buffer> table_form? table_form<CR>end_form<UP><END>
 iabbrev <buffer> BEGIN_BLOCK? BEGIN_BLOCK<CR>END_BLOCK<UP><END>
 iabbrev <buffer> begin_block? begin_block<CR>end_block<UP><END>
 
-iabbrev <buffer> IF? IF ( )<CR>END_IF<UP><END><LEFT><LEFT>
-iabbrev <buffer> if? if ( )<CR>end_if<UP><END><LEFT><LEFT>
-iabbrev <buffer> WHILE? WHILE ( )<CR>END_WHILE<UP><END><LEFT><LEFT>
-iabbrev <buffer> ELSE_IF? ELSE_IF ( )<LEFT><LEFT>
-iabbrev <buffer> else_if? else_if ( )<LEFT><LEFT>
-iabbrev <buffer> while? while ( )<CR>end_while<UP><END><LEFT><LEFT>
-iabbrev <buffer> BEGIN_CASE? BEGIN_CASE ( )<CR>END_CASE<UP><END><LEFT><LEFT>
-iabbrev <buffer> begin_case? begin_case ( )<CR>end_case<UP><END><LEFT><LEFT>
-iabbrev <buffer> CASE? CASE ( )<LEFT><LEFT>
-iabbrev <buffer> case? case ( )<LEFT><LEFT>
+iabbrev <silent><buffer> IF? IF ()<CR>END_IF<UP><END><LEFT><C-R>=<SID>:EatChar('\s')<CR>
+iabbrev <silent><buffer> if? if ()<CR>end_if<UP><END><LEFT><C-R>=<SID>:EatChar('\s')<CR>
+iabbrev <silent><buffer> WHILE? WHILE ()<CR>END_WHILE<UP><END><LEFT><C-R>=<SID>:EatChar('\s')<CR>
+iabbrev <silent><buffer> ELSE_IF? ELSE_IF ()<LEFT><C-R>=<SID>:EatChar('\s')<CR>
+iabbrev <silent><buffer> else_if? else_if ()<LEFT><C-R>=<SID>:EatChar('\s')<CR>
+iabbrev <silent><buffer> while? while ()<CR>end_while<UP><END><LEFT><C-R>=<SID>:EatChar('\s')<CR>
+iabbrev <silent><buffer> BEGIN_CASE? BEGIN_CASE ()<CR>END_CASE<UP><END><LEFT><C-R>=<SID>:EatChar('\s')<CR>
+iabbrev <silent><buffer> begin_case? begin_case ()<CR>end_case<UP><END><LEFT><C-R>=<SID>:EatChar('\s')<CR>
+iabbrev <silent><buffer> CASE? CASE ()<LEFT><C-R>=<SID>:EatChar('\s')<CR>
+iabbrev <silent><buffer> case? case ()<LEFT><C-R>=<SID>:EatChar('\s')<CR>
+
+" To delete a space made by above abbreviation.
+function! <SID>:EatChar(pat)
+    let c = nr2char(getchar(0))
+    return (c =~ a:pat) ? '' : c
+endfunction
 
 " Auto-complete parenthesis
 inoremap ( ()<ESC>i
-inoremap <silent>) <c-r>=<SID>:ClosePair(')')<CR>
+inoremap <silent>) <C-R>=<SID>:ClosePair(')')<CR>
 inoremap { {}<ESC>i
-inoremap <silent>} <c-r>=<SID>:ClosePair('}')<CR>
+inoremap <silent>} <C-R>=<SID>:ClosePair('}')<CR>
 inoremap [ []<ESC>i
-inoremap <silent>] <c-r>=<SID>:ClosePair(']')<CR>
+inoremap <silent>] <C-R>=<SID>:ClosePair(']')<CR>
 inoremap < <><ESC>i
-inoremap <silent>> <c-r>=<SID>:ClosePair('>')<CR>
+inoremap <silent>> <C-R>=<SID>:ClosePair('>')<CR>
 
 function! <SID>:ClosePair(char)
     if getline('.')[col('.') - 1] == a:char
@@ -99,8 +105,43 @@ function! <SID>:ClosePair(char)
     endif
 endfunction
 
+" flag==0: comment a line
+" flag==1: uncomment a line
+function! <SID>:CommentALine(linenum,flag)
+    let line = getline(a:linenum)
+    " comment a line
+    if a:flag == 0
+        " empty line or commented line
+        if line !~ '^\s*\(!.*\)\?$'
+            execute setline(a:linenum,substitute(line,"^\\(\\s*\\)\\(.*\\)$","\\1!\\2",""))
+        endif
+    " uncomment a line
+    else
+        " is a commented line
+        if line =~ '^\s*!'
+            execute setline(a:linenum,substitute(line,"^\\(\\s*\\)!","\\1",""))
+        endif
+    endif
+endfunction
+
+function! CommentLines(flag) range
+    let linenum = a:firstline
+    let position = getpos('.')
+    while linenum <= a:lastline
+        call <SID>:CommentALine(linenum,a:flag)
+        let linenum += 1
+    endwhile
+    call setpos('.',position)
+endfunction
+
+" Binding your hotkey here
+"nnoremap <Leader>key1 :call CommentLines(0)
+"vnoremap <Leader>key1 :call CommentLines(0)
+"nnoremap <Leader>key2 :call CommentLines(1)
+"vnoremap <Leader>key2 :call CommentLines(1)
+
 " wether a character is lower or upper
-function! CharCase(char)
+function! <SID>:CharCase(char)
     let char = char2nr(a:char)
     " upper case
     if char >= 65 && char <= 90
@@ -128,7 +169,7 @@ function! CompleteKeywords(findstart, base)
         " For Windows
         "for keyword in readfile($VIM . '\vimfiles\ftplugin\gembase\dict')
             if keyword =~ '^' . a:base
-                if a:abse != '%' && CharCase(a:base[0]) == "lower"
+                if a:base != '%' && <SID>:CharCase(a:base[0]) == "lower"
                     let keyword = tolower(keyword)
                 endif
                 call add(res,keyword)
@@ -138,7 +179,7 @@ function! CompleteKeywords(findstart, base)
     endif
 endfunction
 
-set omnifunc=CompleteKeywords
+setlocal omnifunc=CompleteKeywords
 
 function! SuperCleverTab()
     " check if at beginning of line or after a space
@@ -186,26 +227,46 @@ if has("gui_running")
         return join( lines, has( "balloon_multiline" ) ? "\n" : " " )
     endfunction
 
-    " Add menu items
-    imenu Gembase.Auto-Completion <F6>
-    nmenu Gembase.Jump.Block.Next\ BEGIN ]]zz
-    nmenu Gembase.Jump.Block.Next\ END []zz
-    nmenu Gembase.Jump.Block.Prev\ BEGIN [[zz
-    nmenu Gembase.Jump.Block.Prev\ END []zz
-    nmenu Gembase.Jump.Comment.Next\ comment ]!zz
-    nmenu Gembase.Jump.Comment.Prev\ comment [!zz
-    nmenu Gembase.Matchit\ Jump %
-    amenu <silent>Gembase.Spell\ check\ toggle <ESC>:call <SID>:SpellCheckToggle()<CR>
-
-    function! <SID>:SpellCheckToggle()
-        if &spell 
-            let &spell = 0
-            echo "Spell check close."
-        else
-            let &spell = 1
-            echo "Spell check open."
+    " Toggle fold state between closed and opened. 
+    " If there is no fold at current line, just moves forward.
+    " If it is present, reverse it's state.
+    function! ToggleFold()
+        if foldlevel('.') != 0
+            if foldclosed('.') < 0
+                . foldclose
+            else
+                . foldopen
+            endif
         endif
+        " Clear status line
+        echo
     endfunction
+
+    " Add menu items
+    imenu &Gembase.Auto-&Completion<Tab>^X^O <C-X><C-O>
+    nmenu Gembase.Global\ Auto-Indent<Tab>gg=G gg=G
+    menu Gembase.-1- :
+    menu <silent>Gembase.Comment.Comment\ Selected\ Lines :call CommentLines(0)<CR>
+    menu <silent>Gembase.Comment.Uncomment\ Selected\ Lines :call CommentLines(1)<CR>
+    menu  <silent>Gembase.Indentation.Increase\ Indent<Tab>:> :><CR>
+    menu <silent>Gembase.Indentation.Decrease\ Indent<Tab>:< :<<CR>
+    nmenu Gembase.Jump.Block.Next\ BEGIN<Tab>]] ]]zz
+    nmenu Gembase.Jump.Block.Next\ END<Tab>][ []zz
+    nmenu Gembase.Jump.Block.-2- :
+    nmenu Gembase.Jump.Block.Prev\ BEGIN<Tab>[[ [[zz
+    nmenu Gembase.Jump.Block.Prev\ END<Tab>[] []zz
+    nmenu Gembase.Jump.Comment.Next\ comment<Tab>]! ]!zz
+    nmenu Gembase.Jump.Comment.Prev\ comment<Tab>[! [!zz
+    nmenu Gembase.Jump.Matchit\ Jump<Tab>% %
+    menu Gembase.-3- :
+    vmenu Gembase.Fold.Create\ a\ Fold<Tab>zf zf
+    nmenu Gembase.Fold.Toggle\ a\ Fold :call ToggleFold()<CR>
+    vmenu Gembase.Fold.Delete\ a\ Fold<Tab>zd zd
+
+    " For Windows
+    "if has('gui_win32')
+        "au GUIEnter * simalt ~x
+    "endif
 
     let b:undo_ftplugin += "balloonexpr< ballooneval<"
 

@@ -1,8 +1,8 @@
                               GEMBASE DML PLUGINS
 
 AUTHOR: Frank Sun <frank.sun.319@gmail.com>
-VERSION: 1.03
-DATE: 2008-08-29
+VERSION: 1.05
+DATE: 2008-10-16
 VIM ENVIRONMENT: version 7
 
 DESCRIPTION
@@ -47,7 +47,8 @@ Others are some accessorial enhancements:
      (5) support "matchit" plugin to jump between keywords within a structure by hitting key "%" in normal mode. Such as "IF" -> "ELSE_IF" -> "ELSE" -> "END_IF", etc.
      (6) also provides parenthesis auto-completion;
      (7) if you runs in GUI, it provides a menu column, which lists some functional item;
-     (8) if you runs in GUI and made a folder, when cursor hangs over it, then system will display a help tip to show the less than 30 lines within folder.
+     (8) if you runs in GUI and made a folder, when cursor hangs over it, then system will display a help tip to show the less than 30 lines within folder;
+     (9) provide a quick approach to comment or uncomment selected lines by GUI menu.
 
 4. Upgrade
 ----------
@@ -62,7 +63,10 @@ and use this command ":GetLatestVimScripts" to upgrade it.
 -------
 
      (1) when handling an ending statement, check its mate to decide whether indent;
-     (2) support fast jumping and matchit switching between six kinds of forms
+     (2) support fast jumping and matchit switching between six kinds of forms;
+     (3) normalize syntax format of current line before open a new line;
+     (4) assemble the results of keyword-completion and context-completion together.
+
 
 6. Acknowledgments
 ------------------
